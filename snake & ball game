@@ -1,0 +1,75 @@
+import pygame
+import sys
+import time
+import random
+
+pygame.init()
+
+WIDTH = 800
+HEIGHT = 600
+SPEED = 10
+BALL_SIZE = 20
+SNAKE_SIZE = 20
+
+x = WIDTH / 2
+y = HEIGHT / 2
+ball_x = random.randint(0, WIDTH - BALL_SIZE)
+ball_y = random.randint(0, HEIGHT - BALL_SIZE)
+snake_length = 1
+snake_direction = "right"
+score = 0
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+font = pygame.font.Font(None, 36)
+
+while True:
+  
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP and snake_direction != "down":
+                snake_direction = "up"
+            elif event.key == pygame.K_DOWN and snake_direction != "up":
+                snake_direction = "down"
+            elif event.key == pygame.K_LEFT and snake_direction != "right":
+                snake_direction = "left"
+            elif event.key == pygame.K_RIGHT and snake_direction != "left":
+                snake_direction = "right"
+
+    if snake_direction == "up":
+        y -= SPEED
+    elif snake_direction == "down":
+        y += SPEED
+    elif snake_direction == "left":
+        x -= SPEED
+    elif snake_direction == "right":
+        x += SPEED
+
+    if (x < ball_x + BALL_SIZE and
+        x + SNAKE_SIZE > ball_x and
+        y < ball_y + BALL_SIZE and
+        y + SNAKE_SIZE > ball_y):
+        score += 1
+        snake_length += 1
+        ball_x = random.randint(0, WIDTH - BALL_SIZE)
+        ball_y = random.randint(0, HEIGHT - BALL_SIZE)
+
+    if (x < 0 or
+        x + SNAKE_SIZE > WIDTH or
+        y < 0 or
+        y + SNAKE_SIZE > HEIGHT):
+        print("Game over! Your score was:", score)
+        pygame.quit()
+        sys.exit()
+
+    screen.fill((0, 0, 0))
+    pygame.draw.rect(screen, (255, 255, 255), (x, y, SNAKE_SIZE, SNAKE_SIZE))
+    pygame.draw.rect(screen, (255, 0, 0), (ball_x, ball_y, BALL_SIZE, BALL_SIZE))
+    text = font.render("Score: " + str(score), True, (255, 255, 255))
+    screen.blit(text, (10, 10))
+    pygame.display.flip()
+
+    time.sleep(1 / 60)
